@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RGui Downloads</title>
+  <style>
+    :root { --blue:#9fbcd2; --line:#748b9d; --paper:#fff; --desk:#a6a6a6; --ink:#111; }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; overflow:hidden; background:var(--desk); color:var(--ink); font-family:"Courier New", monospace; font-size:14px; }
+    .app { min-height:100vh; background:linear-gradient(#f5f8ed 0 41px, #d7e1e9 41px 76px, var(--desk) 76px); }
+    .titlebar { height:22px; display:flex; align-items:center; padding:0 8px; font-family:Arial,sans-serif; font-size:13px; }
+    .r-icon { width:16px; height:16px; border-radius:50%; background:#ecf1e7; color:#3976a0; font-weight:bold; margin-right:5px; text-align:center; line-height:16px; }
+    .window-actions { margin-left:auto; display:flex; gap:18px; font-size:16px; }
+    .menu { height:22px; display:flex; align-items:center; gap:19px; padding-left:7px; background:white; border-top:1px solid #dedede; border-bottom:1px solid #777; font-family:Arial,sans-serif; font-size:13px; }
+    .toolbar { height:32px; display:flex; align-items:center; gap:6px; padding-left:7px; background:#efefef; border-bottom:2px solid #7891a2; }
+    .tool { width:24px; height:23px; border:1px solid #777; background:linear-gradient(#fff,#d7d7d7); display:grid; place-items:center; font-size:15px; cursor:default; }
+    .workspace { display:grid; grid-template-columns:1fr 1fr; gap:4px; height:calc(100vh - 118px); padding-top:2px; }
+    .window { background:#e8eff5; border:1px solid #42647c; box-shadow:inset 0 0 0 1px #fff; min-width:0; min-height:0; display:flex; flex-direction:column; }
+    .window-header { height:28px; flex:0 0 28px; display:flex; align-items:center; padding:0 9px; color:#477c9f; background:linear-gradient(90deg,#dcebf7,#a9c4dc); font-family:Arial,sans-serif; font-size:13px; }
+    .mini-r { font-family:serif; font-size:18px; font-weight:bold; margin-right:5px; }
+    .caption-actions { margin-left:auto; display:flex; gap:4px; }
+    .caption-actions span { width:31px; height:19px; display:grid; place-items:center; color:#1d2f3d; border:1px solid #869eaf; background:#dbe8f2; font-size:13px; }
+    .caption-actions .close { background:#e98478; color:white; border-color:#b45f58; }
+    .content { margin:7px; background:var(--paper); border:1px solid #c8c8c8; flex:1; overflow:auto; }
+    .console { padding:11px 12px; color:#0000cc; line-height:1.42; white-space:pre-wrap; }
+    .command { color:red; }
+    .muted { color:#777; }
+    .download-panel { min-height:100%; }
+    .controls { height:27px; display:flex; align-items:center; justify-content:center; gap:3px; background:#b7b7b7; border-top:1px solid #777; font-family:Arial,sans-serif; }
+    .download-btn, .upload-label { padding:1px 4px; cursor:pointer; color:#111; border:1px solid #718391; background:linear-gradient(#fefefe,#d4d4d4); font:9px Arial,sans-serif; text-decoration:none; }
+    .download-btn:active { border-style:inset; }
+    input[type=file] { display:none; }
+    .files { display:none; position:absolute; right:10px; bottom:44px; width:min(100% - 20px,330px); margin-top:0; border:1px solid #9eaeb8; background:#f5f8fa; }
+    .files.open { display:block; }
+    .files-title { padding:8px 10px; background:#d9e7f1; border-bottom:1px solid #9eaeb8; font:700 13px Arial,sans-serif; }
+    .empty { padding:15px; color:#666; text-align:center; font-size:13px; }
+    .file-row { display:flex; align-items:center; gap:9px; padding:9px 10px; border-bottom:1px solid #d6dde2; }
+    .file-row:last-child { border-bottom:0; }
+    .file-name { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1; }
+    .file-size { color:#777; font-size:12px; }
+    .save { border:1px solid #718391; background:#fff; padding:4px 8px; cursor:pointer; color:#174d77; font-size:12px; }
+    @media (max-width:760px) { body { overflow:auto; } .workspace { grid-template-columns:1fr; height:auto; min-height:calc(100vh - 76px); } .window { min-height:420px; } }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <div class="titlebar"><span class="r-icon">R</span>RGui <div class="window-actions"><span>−</span><span>□</span><span>×</span></div></div>
+    <nav class="menu"><span>File</span><span>Edit</span><span>Packages</span><span>Windows</span><span>Help</span></nav>
+    <div class="toolbar"><div class="tool">📂</div><div class="tool">💾</div><div class="tool">◀</div><div class="tool">▣</div><div class="tool">▤</div></div>
+    <section class="workspace">
+      <section class="window">
+        <header class="window-header"><span class="mini-r">R</span>R Console <div class="caption-actions"><span>−</span><span>□</span><span class="close">×</span></div></header>
+        <div class="content"><div class="console"></div></div>
+      </section>
+      <section class="window">
+        <header class="window-header"><span class="mini-r">R</span>Untitled - R Editor <div class="caption-actions"><span>−</span><span>□</span><span class="close">×</span></div></header>
+        <div class="content"><div class="download-panel">
+          <div class="files" id="file-list" aria-live="polite"></div>
+        </div></div>
+      </section>
+    </section>
+    <div class="controls"><label class="upload-label" for="file-upload">Upload</label><input id="file-upload" type="file" multiple /><button class="download-btn" id="download-button" type="button">Download</button></div>
+  </main>
+  <script>
+    const upload = document.getElementById('file-upload');
+    const downloadButton = document.getElementById('download-button');
+    const fileList = document.getElementById('file-list');
+    let files = [];
+    const size = bytes => bytes < 1024 ? bytes + ' B' : (bytes / 1024 / 1024).toFixed(2) + ' MB';
+    function renderFiles() {
+      if (!files.length) { fileList.innerHTML = '<div class="files-title">Uploaded files</div><div class="empty">No files uploaded yet.</div>'; return; }
+      fileList.innerHTML = '<div class="files-title">Uploaded files (' + files.length + ')</div>' + files.map((file, index) =>
+        '<div class="file-row"><span aria-hidden="true">📄</span><span class="file-name" title="' + file.name.replace(/"/g, '&quot;') + '">' + file.name + '</span><span class="file-size">' + size(file.size) + '</span><button class="save" data-index="' + index + '">Download</button></div>'
+      ).join('');
+    }
+    upload.addEventListener('change', () => { files = [...files, ...upload.files]; upload.value = ''; renderFiles(); fileList.classList.add('open'); });
+    downloadButton.addEventListener('click', () => { renderFiles(); fileList.classList.toggle('open'); });
+    fileList.addEventListener('click', event => {
+      const index = event.target.dataset.index;
+      if (index === undefined) return;
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(files[index]); link.download = files[index].name; link.click();
+      setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+    });
+  </script>
+</body>
+</html>
